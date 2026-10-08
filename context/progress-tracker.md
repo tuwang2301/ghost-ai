@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Complete: Auth Implementation (`context/feature-specs/03-auth.md`)
+- Complete: Project Dialogs & Editor Home (`context/feature-specs/04-project-dialogs.md`)
 
 ## Current Goal
 
-- Ship Clerk authentication integration: provider with dark theme and CSS variable overrides, minimal two-panel sign-in and sign-up pages, route protection via `proxy.ts`, `/` redirects, and `UserButton` in the editor navbar.
+- Ready for next feature spec (e.g. Project persistence or collaborative canvas).
 
 ## Completed
 
@@ -31,7 +31,20 @@ Update this file whenever the current phase, active feature, or implementation s
 - Added Clerk's built-in `UserButton` to the right section of `EditorNavbar`.
 - Fixed the projects sidebar to default to closed (`isSidebarOpen: false`) in `EditorShell`.
 - Fixed `@base-ui/react` orientation selector mismatch in `Tabs` (`components/ui/tabs.tsx`) and polished the sidebar flexbox layout (`components/editor/project-sidebar.tsx`) so the tab bar maintains a compact height (`h-9`) and content area expands cleanly.
-- Validated with TypeScript, ESLint, and Next.js 16 production build (`npm run build`).
+- Implemented `/editor` home screen with minimal cardless layout, exact heading ("Create a project or open an existing one"), description ("Start a new architecture workspace, or choose a project from the sidebar."), and `New Project` button with `Plus` icon.
+- Created dedicated hook `useProjectDialogs` and `ProjectDialogsProvider` in `hooks/use-project-dialogs.tsx` managing dialog state (`create`, `rename`, `delete`), form state (name, live slug preview, errors), loading state, and mock project modifications.
+- Implemented `CreateProjectDialog` with project name input and live slug preview updating on every keystroke.
+- Implemented `RenameProjectDialog` with prefilled project name input, current project name in description, auto-focus, and Enter-key submission.
+- Implemented `DeleteProjectDialog` with destructive confirmation only, no inputs, and destructive button styling.
+- Updated `ProjectSidebar` to display mock projects under "My Projects" and "Shared" tabs, with rename and delete actions for owned projects, actions hidden for shared projects, empty state fallbacks, and mobile backdrop scrim with tap-outside dismiss.
+- Wired all dialog triggers (`EditorHome` New Project, `ProjectSidebar` New Project, Rename, and Delete actions) to the dedicated hook.
+- Validated with TypeScript, ESLint (`npm run lint`), and Next.js 16 production build (`npm run build`).
+- Resolved code review issues from `context/feature-specs/current-issues.md`:
+  - Updated `RenameProjectDialog` to avoid triggering submission when Enter is pressed while IME composition (`e.nativeEvent.isComposing`) is active.
+  - Converted `signInPath` and `signUpPath` configurations in `proxy.ts` to normalized pathnames for full URLs while keeping default fallbacks.
+  - Refined public route check in `proxy.ts` to strictly match exact and child authentication paths rather than arbitrary prefix matches.
+  - Made slug handling consistent across create, rename, and preview in `useProjectDialogs` by rejecting names producing empty slugs, ensuring preview matches saved slug.
+  - Added `inert={!isOpen}` to `ProjectSidebar` so elements are removed from keyboard navigation/tab order when closed while remaining accessible when open.
 
 ## In Progress
 
@@ -39,7 +52,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Build the editor workspace content inside the shared shell.
+- Implement project persistence or collaborative canvas depending on the next feature specification.
 
 ## Open Questions
 

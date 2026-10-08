@@ -1,12 +1,30 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-const signInPath = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || "/sign-in";
-const signUpPath = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || "/sign-up";
+function toPathname(urlOrPath: string | undefined, defaultPath: string): string {
+  if (!urlOrPath) return defaultPath;
+  try {
+    return new URL(urlOrPath, "http://localhost").pathname || defaultPath;
+  } catch {
+    return urlOrPath;
+  }
+}
+
+const signInPath = toPathname(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL, "/sign-in");
+const signUpPath = toPathname(process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL, "/sign-up");
+
+function isExactOrChildPath(pathname: string, basePath: string): boolean {
+  const normalizedBase =
+    basePath.endsWith("/") && basePath.length > 1
+      ? basePath.slice(0, -1)
+      : basePath;
+  return pathname === normalizedBase || pathname.startsWith(`${normalizedBase}/`);
+}
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
   const isPublicRoute =
-    pathname.startsWith(signInPath) || pathname.startsWith(signUpPath);
+    isExactOrChildPath(pathname, signInPath) ||
+    isExactOrChildPath(pathname, signUpPath);
 
   if (!isPublicRoute) {
     await auth.protect();

@@ -10,7 +10,7 @@ interface EditorShellProps {
 }
 
 export function EditorShell({ children }: EditorShellProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
     <>

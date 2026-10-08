@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Complete: Project Dialogs & Editor Home (`context/feature-specs/04-project-dialogs.md`)
+- Complete: Prisma Schema and Data Layer (`context/feature-specs/05-prisma.md`)
 
 ## Current Goal
 
-- Ready for next feature spec (e.g. Project persistence or collaborative canvas).
+- Ready for next feature spec (e.g. Project persistence API routes or collaborative canvas).
 
 ## Completed
 
@@ -45,6 +45,12 @@ Update this file whenever the current phase, active feature, or implementation s
   - Refined public route check in `proxy.ts` to strictly match exact and child authentication paths rather than arbitrary prefix matches.
   - Made slug handling consistent across create, rename, and preview in `useProjectDialogs` by rejecting names producing empty slugs, ensuring preview matches saved slug.
   - Added `inert={!isOpen}` to `ProjectSidebar` so elements are removed from keyboard navigation/tab order when closed while remaining accessible when open.
+- Created `prisma/models/project.prisma` containing `ProjectStatus` enum (`DRAFT`, `ARCHIVED`), `Project` model (owner ID mapped to Clerk user, name, optional description, status enum with DRAFT default, optional canvasJsonPath, timestamps, and indexes on owner ID and creation date), and `ProjectCollaborator` model (project relation with cascade delete, collaborator email, creation timestamp, unique constraint on project/email, and indexes on email and project/date).
+- Created `lib/prisma.ts` as a cached singleton branching between Accelerate (`prisma+postgres://`) and direct `@prisma/adapter-pg` based on `DATABASE_URL`, caching the instance on `globalThis` in development.
+- Successfully ran initial migration `20261008104343_init` creating PostgreSQL tables, foreign keys with cascade delete, indexes, and enums against the database.
+- Generated Prisma Client to `app/generated/prisma`.
+- Verified live database operations (create, query, cascade delete) via Prisma Client.
+- Validated with ESLint (`npm run lint`) and Next.js 16 production build (`npm run build`).
 
 ## In Progress
 
@@ -52,7 +58,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Implement project persistence or collaborative canvas depending on the next feature specification.
+- Ready for next feature spec (e.g. project persistence / API routes or collaborative canvas).
 
 ## Open Questions
 

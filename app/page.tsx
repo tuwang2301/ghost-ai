@@ -1,69 +1,113 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-base px-6 py-12 text-copy-primary">
+      <div className="mx-auto max-w-5xl space-y-8">
+        <div className="flex items-center justify-between gap-4 rounded-3xl border border-surface-border bg-surface px-5 py-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-copy-muted">Design system</p>
+              <h1 className="text-xl font-semibold text-copy-primary">Ghost AI workspace</h1>
+            </div>
+          </div>
+          <Button variant="outline">Preview</Button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="border border-surface-border bg-surface">
+            <CardHeader>
+              <CardTitle>System brief</CardTitle>
+              <CardDescription>Shared design tokens for the real-time architecture workspace.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Button className="w-full">Primary action</Button>
+                <Button variant="secondary" className="w-full">Secondary</Button>
+              </div>
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 border border-surface-border bg-subtle">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="canvas">Canvas</TabsTrigger>
+                </TabsList>
+                <TabsContent value="overview" className="pt-4">
+                  <div className="space-y-3">
+                    <Input placeholder="Project name" defaultValue="Market-ops architecture" />
+                    <Textarea placeholder="Describe the system" defaultValue="User prompt, ingestion pipeline, data services, and AI-assisted review flow." />
+                  </div>
+                </TabsContent>
+                <TabsContent value="canvas" className="pt-4">
+                  <ScrollArea className="h-32 rounded-2xl border border-surface-border bg-subtle p-3">
+                    <ul className="space-y-2 text-sm text-copy-secondary">
+                      <li>• User flow orchestrator</li>
+                      <li>• Shared canvas workspace</li>
+                      <li>• Event-driven processing layer</li>
+                      <li>• Generated markdown spec</li>
+                    </ul>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-surface-border bg-surface">
+            <CardHeader>
+              <CardTitle>Quick actions</CardTitle>
+              <CardDescription>Core workspace primitives.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Dialog>
+                <DialogTrigger
+                  render={
+                    <Button variant="outline" className="w-full" />
+                  }
+                >
+                  Open dialog
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Generate architecture</DialogTitle>
+                    <DialogDescription>
+                      Start an AI-assisted layout for the next system design.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Input placeholder="Describe the architecture" />
+                  <DialogFooter>
+                    <Button variant="outline">Cancel</Button>
+                    <Button>Generate</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" className="w-full justify-center">View starter templates</Button>
+              <Button variant="secondary" className="w-full justify-center">Sync collaborators</Button>
+            </CardContent>
+          </Card>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

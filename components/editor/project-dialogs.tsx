@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useProjectDialogs } from "@/hooks/use-project-dialogs"
+import { useProjectActions } from "@/hooks/use-project-actions"
 
 export function CreateProjectDialog() {
   const {
@@ -19,11 +19,11 @@ export function CreateProjectDialog() {
     closeDialog,
     projectName,
     setProjectName,
-    slugPreview,
+    roomIdPreview,
     createProject,
     isLoading,
     formError,
-  } = useProjectDialogs()
+  } = useProjectActions()
 
   const isOpen = activeDialog === "create"
 
@@ -64,9 +64,9 @@ export function CreateProjectDialog() {
               <p className="text-xs text-state-error">{formError}</p>
             )}
             <div className="flex items-center gap-2 pt-1 text-xs text-copy-muted font-mono">
-              <span className="text-copy-faint">Slug preview:</span>
+              <span className="text-copy-faint">Room ID:</span>
               <span className="text-copy-primary">
-                {slugPreview ? `/editor/${slugPreview}` : "/editor/..."}
+                {roomIdPreview ? `/editor/${roomIdPreview}` : "/editor/..."}
               </span>
             </div>
           </div>
@@ -82,9 +82,9 @@ export function CreateProjectDialog() {
             </Button>
             <Button
               type="submit"
-              disabled={!projectName.trim() || isLoading}
+              disabled={isLoading}
             >
-              Create Project
+              {isLoading ? "Creating..." : "Create Project"}
             </Button>
           </DialogFooter>
         </form>
@@ -103,7 +103,7 @@ export function RenameProjectDialog() {
     renameProject,
     isLoading,
     formError,
-  } = useProjectDialogs()
+  } = useProjectActions()
 
   const isOpen = activeDialog === "rename"
 
@@ -171,7 +171,7 @@ export function RenameProjectDialog() {
               type="submit"
               disabled={!projectName.trim() || isLoading}
             >
-              Save Changes
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>
@@ -187,7 +187,7 @@ export function DeleteProjectDialog() {
     targetProject,
     deleteProject,
     isLoading,
-  } = useProjectDialogs()
+  } = useProjectActions()
 
   const isOpen = activeDialog === "delete"
 
@@ -226,7 +226,7 @@ export function DeleteProjectDialog() {
             onClick={handleDelete}
             disabled={isLoading}
           >
-            Delete Project
+            {isLoading ? "Deleting..." : "Delete Project"}
           </Button>
         </DialogFooter>
       </DialogContent>

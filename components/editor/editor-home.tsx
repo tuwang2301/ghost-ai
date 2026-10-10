@@ -2,10 +2,10 @@
 
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useProjectDialogs } from "@/hooks/use-project-dialogs"
+import { useProjectActions } from "@/hooks/use-project-actions"
 
 export function EditorHome() {
-  const { openCreateDialog } = useProjectDialogs()
+  const { openCreateDialog } = useProjectActions()
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-20 text-center">

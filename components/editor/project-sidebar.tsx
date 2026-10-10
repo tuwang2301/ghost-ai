@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Folder, Pencil, Plus, Trash2, Users, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -11,7 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { useProjectDialogs } from "@/hooks/use-project-dialogs"
+import { useProjectActions } from "@/hooks/use-project-actions"
 
 interface ProjectSidebarProps {
   isOpen: boolean
@@ -27,8 +29,13 @@ function EmptyProjectsState({ message = "No projects yet" }: { message?: string 
 }
 
 export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
-  const { projects, openCreateDialog, openRenameDialog, openDeleteDialog } =
-    useProjectDialogs()
+  const pathname = usePathname()
+  const {
+    projects,
+    openCreateDialog,
+    openRenameDialog,
+    openDeleteDialog,
+  } = useProjectActions()
   const sidebarRef = React.useRef<HTMLElement>(null)
 
   const myProjects = React.useMemo(
@@ -57,6 +64,12 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
     window.addEventListener("pointerdown", handlePointerDown)
     return () => window.removeEventListener("pointerdown", handlePointerDown)
   }, [isOpen, onClose])
+
+  const handleProjectClick = () => {
+    if (window.innerWidth < 768) {
+      onClose()
+    }
+  }
 
   return (
     <>
@@ -101,46 +114,65 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
             ) : (
               <ScrollArea className="h-full">
                 <div className="space-y-1 pr-2">
-                  {myProjects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="group flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 transition-colors hover:bg-subtle"
-                    >
-                      <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                        <Folder className="h-4 w-4 shrink-0 text-copy-muted group-hover:text-brand transition-colors" />
-                        <div className="flex min-w-0 flex-col">
-                          <span className="truncate text-sm font-medium text-copy-primary">
-                            {project.name}
-                          </span>
-                          {project.updatedAt && (
-                            <span className="text-[11px] text-copy-muted">
-                              {project.updatedAt}
+                  {myProjects.map((project) => {
+                    const isActive = pathname === `/editor/${project.id}`
+                    return (
+                      <div
+                        key={project.id}
+                        className={`group flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 transition-colors ${
+                          isActive
+                            ? "bg-accent-dim text-brand border border-accent-primary/20"
+                            : "hover:bg-subtle"
+                        }`}
+                      >
+                        <Link
+                          href={`/editor/${project.id}`}
+                          onClick={handleProjectClick}
+                          className="flex min-w-0 flex-1 items-center gap-2.5 focus:outline-none"
+                        >
+                          <Folder
+                            className={`h-4 w-4 shrink-0 transition-colors ${
+                              isActive ? "text-brand" : "text-copy-muted group-hover:text-brand"
+                            }`}
+                          />
+                          <div className="flex min-w-0 flex-col text-left">
+                            <span
+                              className={`truncate text-sm font-medium ${
+                                isActive ? "text-brand" : "text-copy-primary"
+                              }`}
+                            >
+                              {project.name}
                             </span>
-                          )}
+                            {project.updatedAt && (
+                              <span className="text-[11px] text-copy-muted">
+                                {project.updatedAt}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                        <div className="flex shrink-0 items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => openRenameDialog(project)}
+                            aria-label={`Rename ${project.name}`}
+                            className="text-copy-muted hover:text-copy-primary"
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => openDeleteDialog(project)}
+                            aria-label={`Delete ${project.name}`}
+                            className="text-copy-muted hover:text-state-error"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          onClick={() => openRenameDialog(project)}
-                          aria-label={`Rename ${project.name}`}
-                          className="text-copy-muted hover:text-copy-primary"
-                        >
-                          <Pencil className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          onClick={() => openDeleteDialog(project)}
-                          aria-label={`Delete ${project.name}`}
-                          className="text-copy-muted hover:text-state-error"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </ScrollArea>
             )}
@@ -152,27 +184,46 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
             ) : (
               <ScrollArea className="h-full">
                 <div className="space-y-1 pr-2">
-                  {sharedProjects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="group flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 transition-colors hover:bg-subtle"
-                    >
-                      <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                        <Users className="h-4 w-4 shrink-0 text-copy-muted group-hover:text-ai-text transition-colors" />
-                        <div className="flex min-w-0 flex-col">
-                          <span className="truncate text-sm font-medium text-copy-primary">
-                            {project.name}
-                          </span>
-                          {project.updatedAt && (
-                            <span className="text-[11px] text-copy-muted">
-                              {project.updatedAt}
+                  {sharedProjects.map((project) => {
+                    const isActive = pathname === `/editor/${project.id}`
+                    return (
+                      <div
+                        key={project.id}
+                        className={`group flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 transition-colors ${
+                          isActive
+                            ? "bg-accent-dim text-brand border border-accent-primary/20"
+                            : "hover:bg-subtle"
+                        }`}
+                      >
+                        <Link
+                          href={`/editor/${project.id}`}
+                          onClick={handleProjectClick}
+                          className="flex min-w-0 flex-1 items-center gap-2.5 focus:outline-none"
+                        >
+                          <Users
+                            className={`h-4 w-4 shrink-0 transition-colors ${
+                              isActive ? "text-brand" : "text-copy-muted group-hover:text-ai-text"
+                            }`}
+                          />
+                          <div className="flex min-w-0 flex-col text-left">
+                            <span
+                              className={`truncate text-sm font-medium ${
+                                isActive ? "text-brand" : "text-copy-primary"
+                              }`}
+                            >
+                              {project.name}
                             </span>
-                          )}
-                        </div>
+                            {project.updatedAt && (
+                              <span className="text-[11px] text-copy-muted">
+                                {project.updatedAt}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                        {/* Shared/collaborator projects have actions hidden */}
                       </div>
-                      {/* Shared/collaborator projects have actions hidden */}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </ScrollArea>
             )}

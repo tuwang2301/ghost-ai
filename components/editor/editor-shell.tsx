@@ -5,27 +5,40 @@ import { useState } from "react"
 import { EditorNavbar } from "@/components/editor/editor-navbar"
 import { ProjectDialogs } from "@/components/editor/project-dialogs"
 import { ProjectSidebar } from "@/components/editor/project-sidebar"
-import { ProjectDialogsProvider } from "@/hooks/use-project-dialogs"
+import { WorkspaceProvider } from "@/components/editor/workspace-context"
+import { ProjectActionsProvider } from "@/hooks/use-project-actions"
+import { Project } from "@/types/project"
 
 interface EditorShellProps {
   children: React.ReactNode
+  ownedProjects?: Project[]
+  sharedProjects?: Project[]
 }
 
-export function EditorShell({ children }: EditorShellProps) {
+export function EditorShell({
+  children,
+  ownedProjects = [],
+  sharedProjects = [],
+}: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <ProjectDialogsProvider>
-      <EditorNavbar
-        isSidebarOpen={isSidebarOpen}
-        onSidebarToggle={() => setIsSidebarOpen((isOpen) => !isOpen)}
-      />
-      <ProjectSidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="flex min-h-screen flex-1 flex-col pt-14">{children}</main>
-      <ProjectDialogs />
-    </ProjectDialogsProvider>
+    <ProjectActionsProvider
+      ownedProjects={ownedProjects}
+      sharedProjects={sharedProjects}
+    >
+      <WorkspaceProvider>
+        <EditorNavbar
+          isSidebarOpen={isSidebarOpen}
+          onSidebarToggle={() => setIsSidebarOpen((isOpen) => !isOpen)}
+        />
+        <ProjectSidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+        <main className="flex h-screen flex-1 flex-col pt-14 overflow-hidden">{children}</main>
+        <ProjectDialogs />
+      </WorkspaceProvider>
+    </ProjectActionsProvider>
   )
 }

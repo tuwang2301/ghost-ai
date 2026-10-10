@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Complete: Prisma Schema and Data Layer (`context/feature-specs/05-prisma.md`)
+- Complete: Share Dialog (`context/feature-specs/09-share-dialog.md`)
 
 ## Current Goal
 
-- Ready for next feature spec (e.g. Project persistence API routes or collaborative canvas).
+- Ready for next feature spec (e.g. Collaborative Canvas / Liveblocks integration).
 
 ## Completed
 
@@ -50,7 +50,34 @@ Update this file whenever the current phase, active feature, or implementation s
 - Successfully ran initial migration `20261008104343_init` creating PostgreSQL tables, foreign keys with cascade delete, indexes, and enums against the database.
 - Generated Prisma Client to `app/generated/prisma`.
 - Verified live database operations (create, query, cascade delete) via Prisma Client.
-- Validated with ESLint (`npm run lint`) and Next.js 16 production build (`npm run build`).
+- Created `lib/auth.ts` providing `getAuthUserId()` helper to extract Clerk authenticated user ID with support for test mocking.
+- Updated `proxy.ts` so unauthenticated `/api/*` requests return JSON `401 Unauthorized` instead of redirecting to the sign-in page.
+- Implemented `GET /api/projects` in `app/api/projects/route.ts` to list current user's owned projects ordered by creation date descending, including collaborators.
+- Implemented `POST /api/projects` in `app/api/projects/route.ts` to create projects with authenticated `ownerId`, defaulting missing/empty name to "Untitled Project", and utilizing Prisma's schema cuid strategy.
+- Implemented `PATCH /api/projects/[projectId]` in `app/api/projects/[projectId]/route.ts` with Next.js 16 async route params, 401 unauthenticated check, 404 project existence check, 403 owner authorization enforcement, and name validation.
+- Implemented `DELETE /api/projects/[projectId]` in `app/api/projects/[projectId]/route.ts` with 401 unauthenticated check, 404 project existence check, 403 owner authorization enforcement, and database cascade deletion.
+- Verified all endpoints end-to-end with unit test suite covering 401s, 403s, 404s, creation defaults, cuid generation, owner rename, and owner delete.
+- Created server-side project data helper in `lib/projects.ts` using React `cache` and Prisma to query owned and shared projects, formatted with relative time via `lib/date.ts`.
+- Server-side data fetching wired into `EditorLayout` (`app/editor/layout.tsx`) and `EditorPage` (`app/editor/page.tsx`), passing owned and shared projects down with no client-side fetching on initial load.
+- Created `useProjectActions` hook and `ProjectActionsProvider` in `hooks/use-project-actions.tsx` managing dialog state, live room ID previews with unique short suffix generation, and project mutations.
+- Updated `POST /api/projects` to accept custom room/project ID while defaulting to schema cuid when omitted, keeping the project ID and Liveblocks room ID aligned.
+- Wired create mutation to call `POST /api/projects` and navigate directly to `/editor/[projectId]` workspace.
+- Wired rename mutation to call `PATCH /api/projects/[id]` and trigger `router.refresh()`.
+- Wired delete mutation to call `DELETE /api/projects/[id]`, redirecting to `/editor` if deleting the active workspace, or triggering `router.refresh()`.
+- Replaced legacy `app/editor/[projectId]` route with `/editor/[roomId]` server component according to spec.
+- Created `lib/project-access.ts` access helpers to extract Clerk identity (`userId` + primary email) and verify project access by owner or collaborator.
+- Created `components/editor/access-denied.tsx` with centered layout, lock icon, description, and link back to `/editor`.
+- Implemented `/editor/[roomId]` server component (`app/editor/[roomId]/page.tsx`) with `auth.protect()` redirect and `AccessDenied` view for unauthorized or non-existent projects.
+- Created `components/editor/workspace-context.tsx` and updated `EditorShell` with `WorkspaceProvider` and full-viewport layout (`h-screen overflow-hidden`).
+- Updated `components/editor/editor-navbar.tsx` to display project name when in workspace, along with Share button and AI sidebar toggle.
+- Updated `components/editor/project-sidebar.tsx` with `usePathname()` to highlight active room in both My Projects and Shared tabs.
+- Created `components/editor/workspace-shell.tsx` with dark central canvas placeholder, technical dot grid, centered message, and toggleable right AI sidebar placeholder.
+- Created `lib/clerk-users.ts` utility using Clerk Backend API (`clerkClient().users.getUserList`) to enrich collaborator emails with display names and avatar images with fallback to email.
+- Created `GET/POST /api/projects/[projectId]/collaborators` API endpoints: listing enriched collaborators (accessible by owner and collaborators) and inviting collaborators by email (owner-only mutation enforcement).
+- Created `DELETE /api/projects/[projectId]/collaborators/[collaboratorId]` API endpoint with server-side owner-only deletion enforcement.
+- Created `components/editor/share-dialog.tsx` featuring copy link feedback, owner invite form, collaborator list with Clerk avatar badges, and owner-only remove actions.
+- Connected `Share` button in `EditorNavbar` to open `ShareDialog` in the active workspace.
+- Validated with Next.js 16 build (`npm run build`), TypeScript (`npx tsc --noEmit`), and ESLint (`npm run lint`).
 
 ## In Progress
 
@@ -58,7 +85,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Ready for next feature spec (e.g. project persistence / API routes or collaborative canvas).
+- Ready for next feature spec (e.g. Collaborative Canvas / Liveblocks integration).
 
 ## Open Questions
 

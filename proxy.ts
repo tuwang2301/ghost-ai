@@ -1,4 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 function toPathname(urlOrPath: string | undefined, defaultPath: string): string {
   if (!urlOrPath) return defaultPath;
@@ -27,6 +28,14 @@ export default clerkMiddleware(async (auth, req) => {
     isExactOrChildPath(pathname, signUpPath);
 
   if (!isPublicRoute) {
+    if (pathname.startsWith("/api/")) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      return;
+    }
+
     await auth.protect();
   }
 });
